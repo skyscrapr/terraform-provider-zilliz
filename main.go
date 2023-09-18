@@ -8,7 +8,7 @@ import (
 	"flag"
 	"log"
 
-	"terraform-provider-milvus/milvus/provider"
+	"terraform-provider-zilliz/zilliz/provider"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
@@ -40,7 +40,7 @@ func main() {
 
 	opts := providerserver.ServeOpts{
 		// TODO: Update this string with the published name of your provider.
-		Address: "registry.terraform.io/mufassa12/milvus",
+		Address: "registry.terraform.io/mufassa12/zilliz",
 		Debug:   debug,
 	}
 

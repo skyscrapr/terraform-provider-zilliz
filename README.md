@@ -4,7 +4,7 @@ _This template repository is built on the [Terraform Plugin Framework](https://g
 
 This repository is a *template* for a [Terraform](https://www.terraform.io) provider. It is intended as a starting point for creating Terraform providers, containing:
 
-- A resource and a data source (`milvus/provider/`),
+- A resource and a data source (`zilliz/provider/`),
 - Examples (`examples/`) and generated documentation (`docs/`),
 - Miscellaneous meta files.
 

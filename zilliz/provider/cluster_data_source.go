@@ -7,10 +7,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Mufassa12/zilliz-sdk-go/zilliz"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/Mufassa12/milvus-sdk-go/milvus"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -59,7 +59,7 @@ func (d *ClusterDataSource) Configure(ctx context.Context, req datasource.Config
 		return
 	}
 
-	client, ok := req.ProviderData.(*milvus.Client)
+	client, ok := req.ProviderData.(*zilliz.Client)
 
 	if !ok {
 		resp.Diagnostics.AddError(

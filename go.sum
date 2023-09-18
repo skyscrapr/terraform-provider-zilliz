@@ -11,8 +11,8 @@ github.com/Masterminds/sprig/v3 v3.2.2/go.mod h1:UoaO7Yp8KlPnJIYWTFkMaqPUYKTfGFP
 github.com/Microsoft/go-winio v0.5.2/go.mod h1:WpS1mjBmmwHBEWmogvA2mj8546UReBk4v8QkMxJ6pZY=
 github.com/Microsoft/go-winio v0.6.1 h1:9/kr64B9VUZrLm5YYwbGtUJnMgqWVOdUAXu6Migciow=
 github.com/Microsoft/go-winio v0.6.1/go.mod h1:LRdKpFKfdobln8UmuiYcKPot9D2v6svN5+sAH+4kjUM=
-github.com/Mufassa12/milvus-sdk-go v1.0.2 h1:whdW6b4C2feLBbbBmR3pqsMjJroJiIxP4HIFdNNifX0=
-github.com/Mufassa12/milvus-sdk-go v1.0.2/go.mod h1:8PbYZpxoJOpLu6zDMfNywEFpXH5xSZD2m8WUn+s28xc=
+github.com/Mufassa12/zilliz-sdk-go v1.0.2 h1:whdW6b4C2feLBbbBmR3pqsMjJroJiIxP4HIFdNNifX0=
+github.com/Mufassa12/zilliz-sdk-go v1.0.2/go.mod h1:8PbYZpxoJOpLu6zDMfNywEFpXH5xSZD2m8WUn+s28xc=
 github.com/ProtonMail/go-crypto v0.0.0-20230717121422-5aa5874ade95 h1:KLq8BE0KwCL+mmXnjLWEAOYO+2l2AE4YMmqG1ZpZHBs=
 github.com/ProtonMail/go-crypto v0.0.0-20230717121422-5aa5874ade95/go.mod h1:EjAoLdwvbIOoOQr3ihjnSoLZRtE8azugULFRteWMNc0=
 github.com/acomagu/bufpipe v1.0.4 h1:e3H4WUzM3npvo5uv95QuJM3cQspFNtFBzvJ2oNjKIDQ=
@@ -159,10 +159,10 @@ github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Ky
 github.com/mattn/go-isatty v0.0.14/go.mod h1:7GGIvUiUoEMVVmxf/4nioHXj79iQHKdU27kJ6hsGG94=
 github.com/mattn/go-isatty v0.0.16 h1:bq3VjFmv/sOjHtdEhmkEV4x1AJtvUvOJ2PFAZ5+peKQ=
 github.com/mattn/go-isatty v0.0.16/go.mod h1:kYGgaQfpe5nmfYZH+SKPsOc2e4SrIfOl2e/yFXSvRLM=
-github.com/milvus-io/milvus-sdk-go v1.1.1 h1:QseeGBb92T4ny5jSscaWJ+toG74p5zE0kaxFyeskWSE=
-github.com/milvus-io/milvus-sdk-go v1.1.1/go.mod h1:jyYc5vzEQS9V+ZrSL2h/oeKcYiixvKBV/TrxXbLu01w=
-github.com/milvus-io/milvus-sdk-go/v2 v2.3.0 h1:2b07MORhsJiZoNGsL91evZhpgfwUlLHGQ/VvXVLtAOM=
-github.com/milvus-io/milvus-sdk-go/v2 v2.3.0/go.mod h1:/o0HejRTQciRiHniFDMJiCHswVn1UbFChgtlNRRChd4=
+github.com/zilliz-io/zilliz-sdk-go v1.1.1 h1:QseeGBb92T4ny5jSscaWJ+toG74p5zE0kaxFyeskWSE=
+github.com/zilliz-io/zilliz-sdk-go v1.1.1/go.mod h1:jyYc5vzEQS9V+ZrSL2h/oeKcYiixvKBV/TrxXbLu01w=
+github.com/zilliz-io/zilliz-sdk-go/v2 v2.3.0 h1:2b07MORhsJiZoNGsL91evZhpgfwUlLHGQ/VvXVLtAOM=
+github.com/zilliz-io/zilliz-sdk-go/v2 v2.3.0/go.mod h1:/o0HejRTQciRiHniFDMJiCHswVn1UbFChgtlNRRChd4=
 github.com/mitchellh/cli v1.1.5 h1:OxRIeJXpAMztws/XHlN2vu6imG5Dpq+j61AzAX5fLng=
 github.com/mitchellh/cli v1.1.5/go.mod h1:v8+iFts2sPIKUV1ltktPXMCC8fumSKFItNcD2cLtRR4=
 github.com/mitchellh/copystructure v1.0.0/go.mod h1:SNtv71yrdKgLRyLFxmLdkAbkKEFWgYaq1OVrnRcwhnw=

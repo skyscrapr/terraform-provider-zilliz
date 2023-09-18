@@ -1,9 +1,9 @@
 terraform {
   required_providers {
-    milvus = {
-      source = "mufassa12/milvus"
+    zilliz = {
+      source = "mufassa12/zilliz"
     }
   }
 }
 
-provider "milvus" {}
+provider "zilliz" {}

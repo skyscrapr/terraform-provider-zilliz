@@ -1,4 +1,4 @@
-module terraform-provider-milvus
+module terraform-provider-zilliz
 
 go 1.21.1
 
@@ -16,7 +16,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
-	github.com/Mufassa12/milvus-sdk-go v1.0.2 // indirect
+	github.com/Mufassa12/zilliz-sdk-go v1.0.2 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20230717121422-5aa5874ade95 // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/agext/levenshtein v1.2.2 // indirect
@@ -56,8 +56,8 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
-	github.com/milvus-io/milvus-sdk-go v1.1.1 // indirect
-	github.com/milvus-io/milvus-sdk-go/v2 v2.3.0 // indirect
+	github.com/zilliz-io/zilliz-sdk-go v1.1.1 // indirect
+	github.com/zilliz-io/zilliz-sdk-go/v2 v2.3.0 // indirect
 	github.com/mitchellh/cli v1.1.5 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
