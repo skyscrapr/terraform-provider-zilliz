@@ -82,7 +82,6 @@ func (r *ExampleResource) Configure(ctx context.Context, req resource.ConfigureR
 			"Unexpected Resource Configure Type",
 			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
-
 		return
 	}
 
