@@ -108,7 +108,7 @@ type CreateClusterParams struct {
 }
 
 func (c *Client) CreateCluster(params CreateClusterParams) error {
-	err := c.do("POST", "clusters", params, nil, nil)
+	err := c.do("POST", "clusters/create", params, nil, nil)
 	return err
 }
 
