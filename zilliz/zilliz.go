@@ -53,7 +53,7 @@ type CloudProvider struct {
 
 func (c *Client) ListCloudProviders() ([]CloudProvider, error) {
 	var cloudProviders zillizResponse[[]CloudProvider]
-	err := c.do("GET", "clouds", nil, nil, &cloudProviders)
+	err := c.do("GET", "clouds", nil, &cloudProviders)
 	return cloudProviders.Data, err
 }
 
@@ -65,7 +65,7 @@ type CloudRegion struct {
 
 func (c *Client) ListCloudRegions(cloudId string) ([]CloudRegion, error) {
 	var cloudRegions zillizResponse[[]CloudRegion]
-	err := c.do("GET", "clouds", nil, nil, &cloudRegions)
+	err := c.do("GET", "clouds", nil, &cloudRegions)
 	return cloudRegions.Data, err
 }
 
@@ -89,13 +89,13 @@ type Cluster struct {
 
 func (c *Client) ListClusters() (Clusters, error) {
 	var clusters zillizResponse[Clusters]
-	err := c.do("GET", "clusters", nil, nil, &clusters)
+	err := c.do("GET", "clusters", nil, &clusters)
 	return clusters.Data, err
 }
 
 func (c *Client) DescribeCluster(clusterId string) (Cluster, error) {
 	var cluster zillizResponse[Cluster]
-	err := c.do("GET", "clusters/"+clusterId, nil, nil, &cluster)
+	err := c.do("GET", "clusters/"+clusterId, nil, &cluster)
 	return cluster.Data, err
 }
 
@@ -108,11 +108,11 @@ type CreateClusterParams struct {
 }
 
 func (c *Client) CreateCluster(params CreateClusterParams) error {
-	err := c.do("POST", "clusters/create", params, nil, nil)
+	err := c.do("POST", "clusters/create", params, nil)
 	return err
 }
 
-func (c *Client) do(method string, path string, body interface{}, values url.Values, result interface{}) error {
+func (c *Client) do(method string, path string, body interface{}, result interface{}) error {
 	u, err := c.buildURL(path)
 	if err != nil {
 		return err
@@ -120,9 +120,6 @@ func (c *Client) do(method string, path string, body interface{}, values url.Val
 	req, err := c.newRequest(method, u, body)
 	if err != nil {
 		return err
-	}
-	if values != nil {
-		req.URL.RawQuery = values.Encode()
 	}
 	return c.doRequest(req, result)
 }
