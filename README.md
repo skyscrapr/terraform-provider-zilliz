@@ -1,4 +1,4 @@
-# Terraform Pinecone Provider
+# Terraform provider for Zilliz Cloud
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/skyscrapr/terraform-provider-zilliz.svg)](https://pkg.go.dev/github.com/skyscrapr/terraform-provider-zilliz)
 [![Go Report Card](https://goreportcard.com/badge/github.com/skyscrapr/terraform-provider-zilliz)](https://goreportcard.com/report/github.com/skyscrapr/terraform-provider-zilliz)
@@ -7,9 +7,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/skyscrapr/terraform-provider-zilliz)
 ![License](https://img.shields.io/dub/l/vibe-d.svg)
 
-The Terraform Zilliz Provider allows Terraform to manage Zilliz resources.
-
-Please note: We take Terraform's security and our users' trust very seriously. If you believe you have found a security issue in the Terraform Zilliz Provider, please responsibly disclose it by contacting us.
+This provider allows terraform to manage Zilliz resources.
 
 ## Requirements
 
@@ -18,11 +16,11 @@ Please note: We take Terraform's security and our users' trust very seriously. I
 
 ## Installing the Provider
 
-The provider is registered in the official [terraform registry](https://registry.terraform.io/providers/skyscrapr/zilliz/latest) 
+<!-- The provider is not yet registered in the official [terraform registry](https://registry.terraform.io/providers/skyscrapr/zilliz/latest) 
 
-This enables the provider to be auto-installed when you run ```terraform init```
+This enables the provider to be auto-installed when you run ```terraform init``` -->
 
-You can also download the latest binary for your target platform from the [releases](https://github.com/skyscrapr/terraform-provider-zilliz/releases) tab.
+You can download the latest binary for your target platform from the [releases](https://github.com/skyscrapr/terraform-provider-zilliz/releases) tab.
 
 ## Building the Provider
 
