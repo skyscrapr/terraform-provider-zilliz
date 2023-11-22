@@ -65,7 +65,7 @@ type CloudRegion struct {
 
 func (c *Client) ListCloudRegions(cloudId string) ([]CloudRegion, error) {
 	var cloudRegions zillizResponse[[]CloudRegion]
-	err := c.do("GET", "clouds", nil, &cloudRegions)
+	err := c.do("GET", "regions?cloudId="+cloudId, nil, &cloudRegions)
 	return cloudRegions.Data, err
 }
 
