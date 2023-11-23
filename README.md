@@ -7,7 +7,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/skyscrapr/terraform-provider-zilliz)
 ![License](https://img.shields.io/dub/l/vibe-d.svg)
 
-This provider allows terraform to manage Zilliz resources.
+This provider allows terraform to manage Zilliz Cloud resources.
 
 ## Requirements
 
@@ -47,8 +47,8 @@ terraform {
 }
 ```
 
-You can configure the Pinecone client using environment variables to avoid setting sensitive values in terraform config.
-- Set `ZILLIZ_API_KEY` to your Pinecone API Key.
+You can configure the Zilliz client using environment variables to avoid setting sensitive values in terraform config.
+- Set `ZILLIZ_API_KEY` to your Zilliz API Key.
 
 ## Documentation
 
