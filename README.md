@@ -11,7 +11,7 @@ This provider allows terraform to manage Zilliz Cloud resources.
 
 ## Requirements
 
-- [Terraform](https://www.terraform.io/downloads.html) >= v1.4.6
+- [Terraform](https://www.terraform.io/downloads.html) >= v1.2.x
 - [Go](https://golang.org/doc/install) >= 1.20 (to build the provider plugin)
 
 ## Installing the Provider
