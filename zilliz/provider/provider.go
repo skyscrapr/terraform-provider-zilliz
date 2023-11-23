@@ -76,8 +76,7 @@ func (p *ZillizProvider) Configure(ctx context.Context, req provider.ConfigureRe
 }
 
 func (p *ZillizProvider) Resources(ctx context.Context) []func() resource.Resource {
-	return []func() resource.Resource{
-	}
+	return []func() resource.Resource{}
 }
 
 func (p *ZillizProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
