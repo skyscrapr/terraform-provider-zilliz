@@ -141,6 +141,23 @@ func (c *Client) CreateCluster(params CreateClusterParams) (*CreateClusterRespon
 	return &clusterResponse.Data, err
 }
 
+type ModifyClusterParams struct {
+	CuSize int `json:"cuSize"`
+}
+
+type ModifyClusterResponse struct {
+	ClusterId string `json:"clusterId"`
+}
+
+func (c *Client) ModifyCluster(clusterId string, params *ModifyClusterParams) (*string, error) {
+	var response zillizResponse[ModifyClusterResponse]
+	err := c.do("POST", "clusters/"+clusterId, params, &response)
+	if err != nil {
+		return nil, err
+	}
+	return &response.Data.ClusterId, err
+}
+
 type DropClusterResponse struct {
 	ClusterId string `json:"clusterId"`
 }

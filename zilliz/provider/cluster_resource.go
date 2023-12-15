@@ -7,11 +7,19 @@ import (
 	"context"
 	"fmt"
 	"terraform-provider-zilliz/zilliz"
+	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
+)
+
+const (
+	defaultClusterCreateTimeout time.Duration = 5 * time.Minute
+	defaultClusterUpdateTimeout time.Duration = 5 * time.Minute
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -101,6 +109,20 @@ func (r *ClusterResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Computed:            true,
 			},
 		},
+		Blocks: map[string]schema.Block{
+			"timeouts": timeouts.Block(ctx,
+				timeouts.Opts{
+					Create: true,
+					CreateDescription: `Timeout defaults to 5 mins. Accepts a string that can be [parsed as a duration](https://pkg.go.dev/time#ParseDuration) ` +
+						`consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are ` +
+						`"s" (seconds), "m" (minutes), "h" (hours).`,
+					Update: true,
+					UpdateDescription: `Timeout defaults to 5 mins. Accepts a string that can be [parsed as a duration](https://pkg.go.dev/time#ParseDuration) ` +
+						`consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are ` +
+						`"s" (seconds), "m" (minutes), "h" (hours).`,
+				},
+			),
+		},
 	}
 }
 
@@ -148,6 +170,20 @@ func (r *ClusterResource) Create(ctx context.Context, req resource.CreateRequest
 	data.Password = types.StringValue(response.Password)
 	data.Prompt = types.StringValue(response.Prompt)
 
+	// Wait for cluster to be RUNNING
+	// Create() is passed a default timeout to use if no value
+	// has been supplied in the Terraform configuration.
+	createTimeout, diags := data.Timeouts.Create(ctx, defaultClusterCreateTimeout)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(data.waitForStatus(ctx, createTimeout, r.client, "RUNNING")...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	resp.Diagnostics.Append(data.refresh(r.client)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -164,7 +200,40 @@ func (r *ClusterResource) Read(ctx context.Context, req resource.ReadRequest, re
 }
 
 func (r *ClusterResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	// Collections currently do not support updates
+	var data ClusterResourceModel
+
+	// Read Terraform plan data into the model
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	_, err := r.client.ModifyCluster(data.ClusterId.ValueString(), &zilliz.ModifyClusterParams{
+		CuSize: int(data.CuSize.ValueInt64()),
+	})
+	if err != nil {
+		resp.Diagnostics.AddError("Failed to modify cluster", err.Error())
+		return
+	}
+
+	// Wait for cluster to be RUNNING
+	// Update() is passed a default timeout to use if no value
+	// has been supplied in the Terraform configuration.
+	updateTimeout, diags := data.Timeouts.Create(ctx, defaultClusterUpdateTimeout)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(data.waitForStatus(ctx, updateTimeout, r.client, "RUNNING")...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Save updated data into Terraform state
+	resp.Diagnostics.Append(data.refresh(r.client)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *ClusterResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
@@ -188,22 +257,23 @@ func (r *ClusterResource) Delete(ctx context.Context, req resource.DeleteRequest
 
 // ClusterResourceModel describes the resource data model.
 type ClusterResourceModel struct {
-	ClusterId          types.String `tfsdk:"id"`
-	Plan               types.String `tfsdk:"plan"`
-	ClusterName        types.String `tfsdk:"cluster_name"`
-	CuSize             types.Int64  `tfsdk:"cu_size"`
-	CuType             types.String `tfsdk:"cu_type"`
-	ProjectId          types.String `tfsdk:"project_id"`
-	Username           types.String `tfsdk:"username"`
-	Password           types.String `tfsdk:"password"`
-	Prompt             types.String `tfsdk:"prompt"`
-	Description        types.String `tfsdk:"description"`
-	RegionId           types.String `tfsdk:"region_id"`
-	ClusterType        types.String `tfsdk:"cluster_type"`
-	Status             types.String `tfsdk:"status"`
-	ConnectAddress     types.String `tfsdk:"connect_address"`
-	PrivateLinkAddress types.String `tfsdk:"private_link_address"`
-	CreateTime         types.String `tfsdk:"create_time"`
+	ClusterId          types.String   `tfsdk:"id"`
+	Plan               types.String   `tfsdk:"plan"`
+	ClusterName        types.String   `tfsdk:"cluster_name"`
+	CuSize             types.Int64    `tfsdk:"cu_size"`
+	CuType             types.String   `tfsdk:"cu_type"`
+	ProjectId          types.String   `tfsdk:"project_id"`
+	Username           types.String   `tfsdk:"username"`
+	Password           types.String   `tfsdk:"password"`
+	Prompt             types.String   `tfsdk:"prompt"`
+	Description        types.String   `tfsdk:"description"`
+	RegionId           types.String   `tfsdk:"region_id"`
+	ClusterType        types.String   `tfsdk:"cluster_type"`
+	Status             types.String   `tfsdk:"status"`
+	ConnectAddress     types.String   `tfsdk:"connect_address"`
+	PrivateLinkAddress types.String   `tfsdk:"private_link_address"`
+	CreateTime         types.String   `tfsdk:"create_time"`
+	Timeouts           timeouts.Value `tfsdk:"timeouts"`
 }
 
 func (data *ClusterResourceModel) refresh(client *zilliz.Client) diag.Diagnostics {
@@ -227,6 +297,26 @@ func (data *ClusterResourceModel) refresh(client *zilliz.Client) diag.Diagnostic
 	data.ConnectAddress = types.StringValue(c.ConnectAddress)
 	data.PrivateLinkAddress = types.StringValue(c.PrivateLinkAddress)
 	data.CreateTime = types.StringValue(c.CreateTime)
+
+	return diags
+}
+
+func (data *ClusterResourceModel) waitForStatus(ctx context.Context, timeout time.Duration, client *zilliz.Client, status string) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	err := retry.RetryContext(ctx, timeout, func() *retry.RetryError {
+		cluster, err := client.DescribeCluster(data.ClusterId.ValueString())
+		if err != nil {
+			return retry.NonRetryableError(err)
+		}
+		if cluster.Status != status {
+			return retry.RetryableError(fmt.Errorf("cluster not yet in the %s state. Current state: %s", status, cluster.Status))
+		}
+		return nil
+	})
+	if err != nil {
+		diags.AddError("Failed to wait for cluster to enter the RUNNING state.", err.Error())
+	}
 
 	return diags
 }
