@@ -36,8 +36,18 @@ func NewClient(apiKey string, cloudRegionId string) *Client {
 }
 
 type zillizResponse[T any] struct {
-	Code int `json:"code"`
-	Data T   `json:"data"`
+	Code    int    `json:"code"`
+	Data    T      `json:"data"`
+	Message string `json:"message"`
+}
+
+type ZillizAPIError struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
+func (r *ZillizAPIError) Error() string {
+	return fmt.Sprintf("error, code: %d, message: %s", r.Code, r.Message)
 }
 
 type zillizPage struct {
@@ -67,6 +77,17 @@ func (c *Client) ListCloudRegions(cloudId string) ([]CloudRegion, error) {
 	var cloudRegions zillizResponse[[]CloudRegion]
 	err := c.do("GET", "regions?cloudId="+cloudId, nil, &cloudRegions)
 	return cloudRegions.Data, err
+}
+
+type Project struct {
+	ProjectId   string `json:"projectId"`
+	ProjectName string `json:"projectName"`
+}
+
+func (c *Client) ListProjects() ([]Project, error) {
+	var response zillizResponse[[]Project]
+	err := c.do("GET", "projects", nil, &response)
+	return response.Data, err
 }
 
 type Clusters struct {
@@ -100,16 +121,54 @@ func (c *Client) DescribeCluster(clusterId string) (Cluster, error) {
 }
 
 type CreateClusterParams struct {
-	CreateCollection        bool   `json:"createCollection"`
-	CreateExampleCollection bool   `json:"createExampleCollection"`
-	InstanceName            string `json:"instanceName"`
-	ProjectId               int    `json:"projectId"`
-	RegionId                string `json:"regionId"`
+	Plan        string `json:"plan"`
+	ClusterName string `json:"clusterName"`
+	CUSize      int    `json:"cuSize"`
+	CUType      string `json:"cuType"`
+	ProjectId   string `json:"projectId"`
 }
 
-func (c *Client) CreateCluster(params CreateClusterParams) error {
-	err := c.do("POST", "clusters/create", params, nil)
-	return err
+type CreateClusterResponse struct {
+	ClusterId string `json:"clusterId"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Prompt    string `json:"prompt"`
+}
+
+func (c *Client) CreateCluster(params CreateClusterParams) (*CreateClusterResponse, error) {
+	var clusterResponse zillizResponse[CreateClusterResponse]
+	err := c.do("POST", "clusters/create", params, &clusterResponse)
+	return &clusterResponse.Data, err
+}
+
+type ModifyClusterParams struct {
+	CuSize int `json:"cuSize"`
+}
+
+type ModifyClusterResponse struct {
+	ClusterId string `json:"clusterId"`
+}
+
+func (c *Client) ModifyCluster(clusterId string, params *ModifyClusterParams) (*string, error) {
+	var response zillizResponse[ModifyClusterResponse]
+	err := c.do("POST", "clusters/"+clusterId+"/modify", params, &response)
+	if err != nil {
+		return nil, err
+	}
+	return &response.Data.ClusterId, err
+}
+
+type DropClusterResponse struct {
+	ClusterId string `json:"clusterId"`
+}
+
+func (c *Client) DropCluster(clusterId string) (*string, error) {
+	var response zillizResponse[DropClusterResponse]
+	err := c.do("DELETE", "clusters/"+clusterId+"/drop", nil, &response)
+	if err != nil {
+		return nil, err
+	}
+	return &response.Data.ClusterId, err
 }
 
 func (c *Client) do(method string, path string, body interface{}, result interface{}) error {
@@ -169,6 +228,12 @@ func decodeResponse(body io.Reader, v any) error {
 	b, err := io.ReadAll(body)
 	if err != nil {
 		return err
+	}
+
+	var apierr ZillizAPIError
+	err = json.Unmarshal(b, &apierr)
+	if err == nil && apierr.Code != 200 {
+		return &apierr
 	}
 	err = json.Unmarshal(b, v)
 	return err
