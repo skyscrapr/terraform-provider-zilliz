@@ -151,7 +151,7 @@ type ModifyClusterResponse struct {
 
 func (c *Client) ModifyCluster(clusterId string, params *ModifyClusterParams) (*string, error) {
 	var response zillizResponse[ModifyClusterResponse]
-	err := c.do("POST", "clusters/"+clusterId, params, &response)
+	err := c.do("POST", "clusters/"+clusterId+"/modify", params, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +164,7 @@ type DropClusterResponse struct {
 
 func (c *Client) DropCluster(clusterId string) (*string, error) {
 	var response zillizResponse[DropClusterResponse]
-	err := c.do("DELETE", "clusters/"+clusterId, nil, &response)
+	err := c.do("DELETE", "clusters/"+clusterId+"/drop", nil, &response)
 	if err != nil {
 		return nil, err
 	}

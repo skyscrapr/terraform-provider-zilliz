@@ -19,14 +19,14 @@ func TestAccClusterResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccClusterResourceConfig(rName),
+				Config: testAccClusterResourceConfig(rName, "1"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("zilliz_cluster.test", "id"),
 					resource.TestCheckResourceAttr("zilliz_cluster.test", "cluster_name", rName),
-					// resource.TestCheckResourceAttr("zilliz_cluster.test", "name", rName),
-					// resource.TestCheckResourceAttr("zilliz_cluster.test", "source", rName),
-					// resource.TestCheckResourceAttrSet("zilliz_cluster.test", "size"),
-					// resource.TestCheckResourceAttrSet("zilliz_cluster.test", "status"),
+					resource.TestCheckResourceAttr("zilliz_cluster.test", "plan", "Standard"),
+					resource.TestCheckResourceAttr("zilliz_cluster.test", "cu_size", "1"),
+					resource.TestCheckResourceAttr("zilliz_cluster.test", "cu_type", "Performance-optimized"),
+					resource.TestCheckResourceAttrSet("zilliz_cluster.test", "project_id"),
 				),
 			},
 			// ImportState testing
@@ -41,12 +41,24 @@ func TestAccClusterResource(t *testing.T) {
 			// 	// the upstream service, this can be removed.
 			// 	// ImportStateVerifyIgnore: []string{"source"},
 			// },
-			// // Delete testing automatically occurs in TestCase
+			// Update and Read testing
+			{
+				Config: testAccClusterResourceConfig(rName, "2"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("zilliz_cluster.test", "id"),
+					resource.TestCheckResourceAttr("zilliz_cluster.test", "cluster_name", rName),
+					resource.TestCheckResourceAttr("zilliz_cluster.test", "plan", "Standard"),
+					resource.TestCheckResourceAttr("zilliz_cluster.test", "cu_size", "2"),
+					resource.TestCheckResourceAttr("zilliz_cluster.test", "cu_type", "Performance-optimized"),
+					resource.TestCheckResourceAttrSet("zilliz_cluster.test", "project_id"),
+				),
+			},
+			// Delete testing automatically occurs in TestCase
 		},
 	})
 }
 
-func testAccClusterResourceConfig(name string) string {
+func testAccClusterResourceConfig(name string, cu_size string) string {
 	return fmt.Sprintf(`
 provider "zilliz" {
 	cloud_region_id = "gcp-us-west1"
@@ -58,9 +70,9 @@ data "zilliz_projects" "test" {
 resource "zilliz_cluster" "test" {
 	plan         = "Standard"
 	cluster_name = %q
-	cu_size      = 1
+	cu_size      = %q
 	cu_type      = "Performance-optimized"
 	project_id   = data.zilliz_projects.test.projects[0].project_id
 }
-`, name)
+`, name, cu_size)
 }
