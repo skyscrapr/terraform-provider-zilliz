@@ -9,7 +9,6 @@ import (
 	"terraform-provider-zilliz/zilliz"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	// "github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -149,7 +148,7 @@ func (r *ClusterResource) Create(ctx context.Context, req resource.CreateRequest
 	data.Password = types.StringValue(response.Password)
 	data.Prompt = types.StringValue(response.Prompt)
 
-	resp.Diagnostics.Append(data.refresh(ctx, r.client)...)
+	resp.Diagnostics.Append(data.refresh(r.client)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -160,7 +159,7 @@ func (r *ClusterResource) Read(ctx context.Context, req resource.ReadRequest, re
 		return
 	}
 
-	resp.Diagnostics.Append(data.refresh(ctx, r.client)...)
+	resp.Diagnostics.Append(data.refresh(r.client)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -207,7 +206,7 @@ type ClusterResourceModel struct {
 	CreateTime         types.String `tfsdk:"create_time"`
 }
 
-func (data *ClusterResourceModel) refresh(ctx context.Context, client *zilliz.Client) diag.Diagnostics {
+func (data *ClusterResourceModel) refresh(client *zilliz.Client) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	c, err := client.DescribeCluster(data.ClusterId.ValueString())
