@@ -48,7 +48,7 @@ func (r *ClusterResource) Metadata(ctx context.Context, req resource.MetadataReq
 
 func (r *ClusterResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Cluster resource. If 'plan', 'cu_size' and 'cu-type' are not specified, then a serverless cluster is created.",
+		MarkdownDescription: "Cluster resource. If 'plan', 'cu_size' and 'cu-type' are specified, then a dedicated cluster is created. Otherwise a serverless cluster in created.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Cluster identifier",

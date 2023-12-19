@@ -3,12 +3,12 @@
 page_title: "zilliz_cluster Resource - terraform-provider-zilliz"
 subcategory: ""
 description: |-
-  Cluster resource. If 'plan', 'cu_size' and 'cu-type' are not specified, then a serverless cluster is created.
+  Cluster resource. If 'plan', 'cu_size' and 'cu-type' are specified, then a dedicated cluster is created. Otherwise a serverless cluster in created.
 ---
 
 # zilliz_cluster (Resource)
 
-Cluster resource. If 'plan', 'cu_size' and 'cu-type' are not specified, then a serverless cluster is created.
+Cluster resource. If 'plan', 'cu_size' and 'cu-type' are specified, then a dedicated cluster is created. Otherwise a serverless cluster in created.
 
 ## Example Usage
 
