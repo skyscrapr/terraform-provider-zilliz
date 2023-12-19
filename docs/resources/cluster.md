@@ -15,7 +15,7 @@ Cluster resource. If 'plan', 'cu_size' and 'cu-type' are not specified, then a s
 ```terraform
 terraform {
   required_providers {
-    pinecone = {
+    zilliz = {
       source = "skyscrapr/zilliz"
     }
   }
@@ -33,6 +33,11 @@ resource "zilliz_cluster" "test" {
   cluster_name = "Cluster-01"
   cu_size      = "1"
   cu_type      = "Performance-optimized"
+  project_id   = data.zilliz_projects.test.projects[0].project_id
+}
+
+resource "zilliz_cluster" "serverless_test" {
+  cluster_name = "Cluster-02"
   project_id   = data.zilliz_projects.test.projects[0].project_id
 }
 ```
