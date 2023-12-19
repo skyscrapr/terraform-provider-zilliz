@@ -128,6 +128,11 @@ type CreateClusterParams struct {
 	ProjectId   string `json:"projectId"`
 }
 
+type CreateServerlessClusterParams struct {
+	ClusterName string `json:"clusterName"`
+	ProjectId   string `json:"projectId"`
+}
+
 type CreateClusterResponse struct {
 	ClusterId string `json:"clusterId"`
 	Username  string `json:"username"`
@@ -138,6 +143,12 @@ type CreateClusterResponse struct {
 func (c *Client) CreateCluster(params CreateClusterParams) (*CreateClusterResponse, error) {
 	var clusterResponse zillizResponse[CreateClusterResponse]
 	err := c.do("POST", "clusters/create", params, &clusterResponse)
+	return &clusterResponse.Data, err
+}
+
+func (c *Client) CreateServerlessCluster(params CreateServerlessClusterParams) (*CreateClusterResponse, error) {
+	var clusterResponse zillizResponse[CreateClusterResponse]
+	err := c.do("POST", "clusters/createServerless", params, &clusterResponse)
 	return &clusterResponse.Data, err
 }
 

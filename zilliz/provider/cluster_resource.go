@@ -10,11 +10,15 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 )
@@ -44,32 +48,14 @@ func (r *ClusterResource) Metadata(ctx context.Context, req resource.MetadataReq
 
 func (r *ClusterResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Cluster resource",
+		MarkdownDescription: "Cluster resource. If 'plan', 'cu_size' and 'cu-type' are not specified, then a serverless cluster is created.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Cluster identifier",
 				Computed:            true,
 			},
-			"plan": schema.StringAttribute{
-				MarkdownDescription: "The plan tier of the Zilliz Cloud service. Available options are Standard and Enterprise.",
-				Required:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
-			},
 			"cluster_name": schema.StringAttribute{
 				MarkdownDescription: "The name of the cluster to be created. It is a string of no more than 32 characters.",
-				Required:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
-			},
-			"cu_size": schema.Int64Attribute{
-				MarkdownDescription: "The size of the CU to be used for the created cluster. It is an integer from 1 to 256.",
-				Required:            true,
-			},
-			"cu_type": schema.StringAttribute{
-				MarkdownDescription: "The type of the CU used for the Zilliz Cloud cluster to be created. Available options are Performance-optimized, Capacity-optimized, and Cost-optimized. This parameter defaults to Performance-optimized. The value defaults to Performance-optimized.",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -80,6 +66,43 @@ func (r *ClusterResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
+				},
+			},
+			"plan": schema.StringAttribute{
+				MarkdownDescription: "The plan tier of the Zilliz Cloud service. Available options are Standard and Enterprise.",
+				Optional:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+				Validators: []validator.String{
+					stringvalidator.AlsoRequires(
+						path.MatchRelative().AtParent().AtName("cu_size"),
+						path.MatchRelative().AtParent().AtName("cu_type"),
+					),
+				},
+			},
+			"cu_size": schema.Int64Attribute{
+				MarkdownDescription: "The size of the CU to be used for the created cluster. It is an integer from 1 to 256.",
+				Optional:            true,
+				Computed:            true,
+				Validators: []validator.Int64{
+					int64validator.AlsoRequires(
+						path.MatchRelative().AtParent().AtName("plan"),
+						path.MatchRelative().AtParent().AtName("cu_type"),
+					),
+				},
+			},
+			"cu_type": schema.StringAttribute{
+				MarkdownDescription: "The type of the CU used for the Zilliz Cloud cluster to be created. Available options are Performance-optimized, Capacity-optimized, and Cost-optimized. This parameter defaults to Performance-optimized. The value defaults to Performance-optimized.",
+				Optional:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+				Validators: []validator.String{
+					stringvalidator.AlsoRequires(
+						path.MatchRelative().AtParent().AtName("cu_size"),
+						path.MatchRelative().AtParent().AtName("plan"),
+					),
 				},
 			},
 			"username": schema.StringAttribute{
@@ -168,13 +191,23 @@ func (r *ClusterResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
-	response, err := r.client.CreateCluster(zilliz.CreateClusterParams{
-		Plan:        data.Plan.ValueString(),
-		ClusterName: data.ClusterName.ValueString(),
-		CUSize:      int(data.CuSize.ValueInt64()),
-		CUType:      data.CuType.ValueString(),
-		ProjectId:   data.ProjectId.ValueString(),
-	})
+	var response *zilliz.CreateClusterResponse
+	var err error
+
+	if data.Plan.IsNull() && data.CuSize.IsUnknown() && data.CuType.IsNull() {
+		response, err = r.client.CreateServerlessCluster(zilliz.CreateServerlessClusterParams{
+			ClusterName: data.ClusterName.ValueString(),
+			ProjectId:   data.ProjectId.ValueString(),
+		})
+	} else {
+		response, err = r.client.CreateCluster(zilliz.CreateClusterParams{
+			Plan:        data.Plan.ValueString(),
+			ClusterName: data.ClusterName.ValueString(),
+			CUSize:      int(data.CuSize.ValueInt64()),
+			CUType:      data.CuType.ValueString(),
+			ProjectId:   data.ProjectId.ValueString(),
+		})
+	}
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to create cluster", err.Error())
 		return
