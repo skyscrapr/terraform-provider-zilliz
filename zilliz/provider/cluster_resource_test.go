@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestAccClusterResource(t *testing.T) {
+func TestAccClusterResource_basic(t *testing.T) {
 	rName := sdkacctest.RandomWithPrefix("tftest")
 
 	resource.Test(t, resource.TestCase{
@@ -19,7 +19,7 @@ func TestAccClusterResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccClusterResourceConfig(rName, "1"),
+				Config: testAccClusterResourceConfig_basic(rName, "1"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("zilliz_cluster.test", "id"),
 					resource.TestCheckResourceAttr("zilliz_cluster.test", "cluster_name", rName),
@@ -30,20 +30,11 @@ func TestAccClusterResource(t *testing.T) {
 				),
 			},
 			// ImportState testing
-			// {
-			// 	ResourceName:      "zilliz_cluster.test",
-			// 	ImportState:       true,
-			// 	ImportStateVerify: true,
-			// 	// ImportStateVerifyIdentifierAttribute: "name",
-			// 	// This is not normally necessary, but is here because this
-			// 	// example code does not have an actual upstream service.
-			// 	// Once the Read method is able to refresh information from
-			// 	// the upstream service, this can be removed.
-			// 	// ImportStateVerifyIgnore: []string{"source"},
-			// },
+			//  - Not supported
+			//
 			// Update and Read testing
 			{
-				Config: testAccClusterResourceConfig(rName, "2"),
+				Config: testAccClusterResourceConfig_basic(rName, "2"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("zilliz_cluster.test", "id"),
 					resource.TestCheckResourceAttr("zilliz_cluster.test", "cluster_name", rName),
@@ -58,7 +49,33 @@ func TestAccClusterResource(t *testing.T) {
 	})
 }
 
-func testAccClusterResourceConfig(name string, cu_size string) string {
+func TestAccClusterResource_serverless(t *testing.T) {
+	rName := sdkacctest.RandomWithPrefix("tftest")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create and Read testing
+			{
+				Config: testAccClusterResourceConfig_serverless(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("zilliz_cluster.test", "id"),
+					resource.TestCheckResourceAttr("zilliz_cluster.test", "cluster_name", rName),
+					resource.TestCheckResourceAttr("zilliz_cluster.test", "cu_size", "0"),
+					resource.TestCheckNoResourceAttr("zilliz_cluster.test", "plan"),
+					resource.TestCheckNoResourceAttr("zilliz_cluster.test", "cu_type"),
+					resource.TestCheckResourceAttrSet("zilliz_cluster.test", "project_id"),
+				),
+			},
+			// ImportState - Not supported
+			// Update and Read testing - Not supported
+			// Delete testing automatically occurs in TestCase
+		},
+	})
+}
+
+func testAccClusterResourceConfig_basic(name string, cu_size string) string {
 	return fmt.Sprintf(`
 provider "zilliz" {
 	cloud_region_id = "gcp-us-west1"
@@ -75,4 +92,20 @@ resource "zilliz_cluster" "test" {
 	project_id   = data.zilliz_projects.test.projects[0].project_id
 }
 `, name, cu_size)
+}
+
+func testAccClusterResourceConfig_serverless(name string) string {
+	return fmt.Sprintf(`
+provider "zilliz" {
+	cloud_region_id = "gcp-us-west1"
+}
+
+data "zilliz_projects" "test" {
+}
+
+resource "zilliz_cluster" "test" {
+	cluster_name = %q
+	project_id   = data.zilliz_projects.test.projects[0].project_id
+}
+`, name)
 }
