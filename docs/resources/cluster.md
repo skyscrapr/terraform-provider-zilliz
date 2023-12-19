@@ -3,12 +3,12 @@
 page_title: "zilliz_cluster Resource - terraform-provider-zilliz"
 subcategory: ""
 description: |-
-  Cluster resource
+  Cluster resource. If 'plan', 'cu_size' and 'cu-type' are not specified, then a serverless cluster is created.
 ---
 
 # zilliz_cluster (Resource)
 
-Cluster resource
+Cluster resource. If 'plan', 'cu_size' and 'cu-type' are not specified, then a serverless cluster is created.
 
 ## Example Usage
 
@@ -43,13 +43,13 @@ resource "zilliz_cluster" "test" {
 ### Required
 
 - `cluster_name` (String) The name of the cluster to be created. It is a string of no more than 32 characters.
-- `cu_size` (Number) The size of the CU to be used for the created cluster. It is an integer from 1 to 256.
-- `cu_type` (String) The type of the CU used for the Zilliz Cloud cluster to be created. Available options are Performance-optimized, Capacity-optimized, and Cost-optimized. This parameter defaults to Performance-optimized. The value defaults to Performance-optimized.
-- `plan` (String) The plan tier of the Zilliz Cloud service. Available options are Standard and Enterprise.
 - `project_id` (String) The ID of the project where the cluster is to be created.
 
 ### Optional
 
+- `cu_size` (Number) The size of the CU to be used for the created cluster. It is an integer from 1 to 256.
+- `cu_type` (String) The type of the CU used for the Zilliz Cloud cluster to be created. Available options are Performance-optimized, Capacity-optimized, and Cost-optimized. This parameter defaults to Performance-optimized. The value defaults to Performance-optimized.
+- `plan` (String) The plan tier of the Zilliz Cloud service. Available options are Standard and Enterprise.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
